@@ -104,6 +104,11 @@ Run the query cell — type any question and get answers with citations
 ## Environment Variables
 This project uses HuggingFace open-source models which are completely free
 and require no API keys. No environment variables are needed to run this project.
+If we switch to OpenAI embeddings in future, we would need:
+
+| Variable | Description |
+|----------|-------------|
+| OPENAI_API_KEY | Your OpenAI key from platform.openai.com |
 
 ## Example Queries
 
