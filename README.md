@@ -1,7 +1,3 @@
-## Environment Variables
-This project uses HuggingFace open-source models which are completely free
-and require no API keys. No environment variables are needed to run this project.
-
 # RAG Document Q&A Bot
 
 A command-line question-answering bot that retrieves answers exclusively from a
@@ -106,12 +102,8 @@ Run the ingestion cell — loads, chunks, embeds and saves to disk
 Run the query cell — type any question and get answers with citations
 
 ## Environment Variables
-
-| Variable | Description | Where to get |
-|----------|-------------|--------------|
-| OPENAI_API_KEY | OpenAI API key | platform.openai.com/api-keys |
-
-**Never commit your actual API key to GitHub.**
+This project uses HuggingFace open-source models which are completely free
+and require no API keys. No environment variables are needed to run this project.
 
 ## Example Queries
 
