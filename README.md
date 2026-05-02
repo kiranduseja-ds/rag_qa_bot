@@ -1,3 +1,7 @@
+## Environment Variables
+This project uses HuggingFace open-source models which are completely free
+and require no API keys. No environment variables are needed to run this project.
+
 # RAG Document Q&A Bot
 
 A command-line question-answering bot that retrieves answers exclusively from a
