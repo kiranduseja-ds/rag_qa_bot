@@ -1,112 +1,173 @@
-RAG Document Q&A Bot
+Got it — you want the **same README in original style**, with **vertical architecture diagram (clean + professional)** and aligned with your actual code (HuggingFace + FAISS, no OpenAI).
 
-A simple command-line style question-answering system that retrieves answers directly from a set of uploaded documents using a Retrieval-Augmented Generation (RAG) approach.
+Here is your **final corrected version** 
 
-The system does not rely on general knowledge. It only answers based on the content present in the uploaded PDF documents, ensuring grounded and document-based responses.
+---
 
-Tech Stack
-Library	Purpose
-Python	Core programming language
-langchain	RAG pipeline framework
-langchain-community	Document loaders, embeddings, vector store
-faiss-cpu	Vector database for similarity search
-transformers	Language model (GPT-2) for answer generation
-sentence-transformers	Embedding model (MiniLM)
-pypdf	PDF text extraction
-Architecture Overview
+# RAG Document Q&A Bot
+
+A command-line style question-answering system that retrieves answers strictly from a local document collection using Retrieval-Augmented Generation (RAG).
+
+The bot answers only from the uploaded documents and does not rely on external knowledge, ensuring grounded and context-based responses.
+
+---
+
+## Tech Stack
+
+| Library               | Purpose                           |
+| --------------------- | --------------------------------- |
+| Python                | Core language                     |
+| langchain             | RAG pipeline framework            |
+| langchain-community   | Loaders, embeddings, vector store |
+| faiss-cpu             | Vector database                   |
+| transformers          | Language model (GPT-2)            |
+| sentence-transformers | Embedding model (MiniLM)          |
+| pypdf                 | PDF text extraction               |
+
+---
+
+## Architecture Overview
+
+```
 User Query
     │
     ▼
-[1. INGESTION] → Load PDFs from /data folder
+[1. INGESTION]
+Load PDFs from /data folder using PyPDFLoader
     │
     ▼
-[2. CHUNKING] → Split into chunks (1000 size, 100 overlap)
+[2. CHUNKING]
+Split into chunks (1000 characters, 100 overlap)
+Store metadata (filename, page)
     │
     ▼
-[3. EMBEDDING] → Convert chunks into vectors using MiniLM
+[3. EMBEDDING]
+Convert chunks into vectors using MiniLM (all-MiniLM-L6-v2)
     │
     ▼
-[4. VECTOR DB] → Store embeddings in FAISS
+[4. VECTOR DATABASE]
+Store embeddings in FAISS and persist locally
     │
     ▼
-[5. RETRIEVAL] → Retrieve top 3 relevant chunks
+[5. RETRIEVAL]
+Embed query and retrieve top-k relevant chunks (k=3)
     │
     ▼
-[6. GENERATION] → GPT-2 generates answer from retrieved context
+[6. GENERATION]
+Generate answer using GPT-2 based only on retrieved context
     │
     ▼
-Answer + Source (file name and page)
-Chunking Strategy
+Answer + Source (Filename + Page Number)
+```
+
+---
+
+## Chunking Strategy
 
 Strategy: Fixed-size chunking with overlap
 
-Chunk size: 1000 characters
-Overlap: 100 characters
+* Chunk size: 1000 characters
+* Overlap: 100 characters
 
 Reason:
-Larger chunks reduce the total number of chunks, improving speed.
-Overlap ensures that context is not lost at boundaries between chunks.
+This approach ensures that context is preserved between chunks while keeping the number of chunks manageable. Larger chunks improve performance and reduce processing time, while overlap prevents loss of important information at boundaries.
 
-Embedding Model and Vector Database
+---
+
+## Embedding Model and Vector Database
 
 Embedding Model: all-MiniLM-L6-v2 (HuggingFace)
 
-Lightweight and fast
-Suitable for semantic similarity tasks
-Works locally without API usage
+* Lightweight and fast
+* Good performance for semantic similarity
+* Works locally without requiring any API
 
 Vector Database: FAISS
 
-Efficient similarity search
-Runs locally without external setup
-Stores embeddings for fast retrieval
-Setup Instructions
-1. Open in Google Colab
-Go to Google Colab
-Create a new notebook
-2. Install dependencies
+* Fast similarity search
+* No external server required
+* Stores embeddings locally for reuse
+
+---
+
+## Setup Instructions
+
+### 1. Open in Google Colab
+
+Create a new notebook in Google Colab.
+
+---
+
+### 2. Install Dependencies
+
+```
 pip install langchain==0.1.17 langchain-community faiss-cpu transformers sentence-transformers pypdf
-3. Upload documents
+```
 
-Run the upload cell and select your PDF files (4–5 documents).
+---
 
-4. Run indexing pipeline
+### 3. Upload Documents
 
-Execute cells in order:
+Run the upload cell and select your 4–5 PDF files.
 
-Load documents
-Split into chunks
-Generate embeddings
-Store in FAISS
+---
 
-This step creates and saves the vector database.
+### 4. Index Documents
 
-5. Run query system
+Run the indexing steps:
+
+* Load PDFs
+* Perform chunking
+* Generate embeddings
+* Store in FAISS
+
+This step prepares the vector database.
+
+---
+
+### 5. Run the Bot
 
 Run the chatbot cell and start asking questions.
 
-Example Queries
-What is artificial intelligence?
-Explain climate change
-What are key features of the Indian economy?
-What is the impact of COVID-19?
-What are important space missions?
-Output
+---
 
-For each query, the system provides:
+## Example Queries
 
-Generated answer
-Source information (file name and page number)
-Environment Variables
+* What is artificial intelligence?
+* Explain climate change
+* What are features of the Indian economy?
+* What is the impact of COVID-19?
+* What are major space missions?
 
-This project uses open-source models and does not require any API keys.
+---
 
-Known Limitations
-The language model used (GPT-2) is basic, so answers may be less detailed
-The system only answers from uploaded documents
-Accuracy depends on document quality
-Colab sessions reset, so files must be re-uploaded
-Final Note
+## Output
 
-This project demonstrates a complete RAG pipeline including document ingestion, chunking, embedding, retrieval, and answer generation. The focus is on building a simple, understandable system that can be explained clearly and extended further.
+The system returns:
+
+* Generated answer
+* Source metadata (file name and page number)
+
+---
+
+## Environment Variables
+
+No environment variables are required.
+This project uses fully open-source models.
+
+---
+
+## Known Limitations
+
+* The GPT-2 model is basic, so answers may be less detailed
+* The system cannot answer outside the provided documents
+* Requires re-uploading files in each Colab session
+* Works best with clear and structured text
+
+---
+
+## Final Note
+
+This project demonstrates a complete RAG pipeline from document ingestion to answer generation. The implementation focuses on clarity, simplicity, and practical understanding, making it easy to explain and extend further.
+
 
