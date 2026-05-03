@@ -1,128 +1,112 @@
-# RAG Document Q&A Bot
+RAG Document Q&A Bot
 
-A command-line question-answering bot that retrieves answers exclusively from a
-local document collection using Retrieval-Augmented Generation (RAG). Built with
-LangChain, OpenAI, and FAISS. The bot never answers from its own training data —
-only from your uploaded documents.
+A simple command-line style question-answering system that retrieves answers directly from a set of uploaded documents using a Retrieval-Augmented Generation (RAG) approach.
 
-## Tech Stack
+The system does not rely on general knowledge. It only answers based on the content present in the uploaded PDF documents, ensuring grounded and document-based responses.
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| Python | 3.12 | Core language |
-| langchain | 0.0.350 | RAG pipeline framework |
-| langchain-community | 0.0.1 | Document loaders, FAISS wrapper |
-| openai | 1.3.5 | Embeddings + GPT-3.5 answer generation |
-| faiss-cpu | latest | Vector database |
-| pypdf | latest | PDF text extraction |
-| tiktoken | latest | Token counting |
-| docx2txt | 0.8 | DOCX support |
-
-## Architecture Overview
-
-```
+Tech Stack
+Library	Purpose
+Python	Core programming language
+langchain	RAG pipeline framework
+langchain-community	Document loaders, embeddings, vector store
+faiss-cpu	Vector database for similarity search
+transformers	Language model (GPT-2) for answer generation
+sentence-transformers	Embedding model (MiniLM)
+pypdf	PDF text extraction
+Architecture Overview
 User Query
     │
     ▼
-[1. INGESTION] → Load PDFs from /data folder using PyPDFLoader
+[1. INGESTION] → Load PDFs from /data folder
     │
     ▼
-[2. CHUNKING] → Split into 500-char chunks, 50-char overlap, store filename + page
+[2. CHUNKING] → Split into chunks (1000 size, 100 overlap)
     │
     ▼
-[3. EMBEDDING] → Batch embed all chunks using text-embedding-3-small
+[3. EMBEDDING] → Convert chunks into vectors using MiniLM
     │
     ▼
-[4. VECTOR DB] → Store in FAISS, persist to disk in /vectorstore
+[4. VECTOR DB] → Store embeddings in FAISS
     │
     ▼
-[5. RETRIEVAL] → Embed query, similarity search, retrieve top-k chunks
+[5. RETRIEVAL] → Retrieve top 3 relevant chunks
     │
     ▼
-[6. GENERATION] → GPT-3.5-turbo answers ONLY from retrieved chunks
+[6. GENERATION] → GPT-2 generates answer from retrieved context
     │
     ▼
-Answer + Source Filename + Page Number
-```
+Answer + Source (file name and page)
+Chunking Strategy
 
-## Chunking Strategy
+Strategy: Fixed-size chunking with overlap
 
-**Strategy: Fixed-size chunking with overlap**
-- Chunk size: 500 characters
-- Overlap: 50 characters
+Chunk size: 1000 characters
+Overlap: 100 characters
 
-**Why:** Fixed-size chunking gives uniform, predictable chunks that work well
-with embedding models. The 50-character overlap ensures sentences split at
-chunk boundaries are not lost. Chosen over sentence-based chunking because
-our documents vary in formatting and sentence length.
+Reason:
+Larger chunks reduce the total number of chunks, improving speed.
+Overlap ensures that context is not lost at boundaries between chunks.
 
-## Embedding Model and Vector Database
+Embedding Model and Vector Database
 
-**Embedding Model: OpenAI text-embedding-3-small**
-- High accuracy at low cost
-- All chunks embedded in a single batched API call
-- 1536-dimensional vectors
+Embedding Model: all-MiniLM-L6-v2 (HuggingFace)
 
-**Vector Database: FAISS**
-- Persists to disk — no re-indexing on every run
-- No external server needed
-- Fast similarity search using L2 distance
-- Clear separation: ingest.py saves, query.py loads
+Lightweight and fast
+Suitable for semantic similarity tasks
+Works locally without API usage
 
-## Setup Instructions
+Vector Database: FAISS
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/kiranduseja-ds/rag_qa_bot
-```
+Efficient similarity search
+Runs locally without external setup
+Stores embeddings for fast retrieval
+Setup Instructions
+1. Open in Google Colab
+Go to Google Colab
+Create a new notebook
+2. Install dependencies
+pip install langchain==0.1.17 langchain-community faiss-cpu transformers sentence-transformers pypdf
+3. Upload documents
 
-### 2. Open in Google Colab
-- Go to colab.research.google.com
-- File → Upload Notebook → select rag_qa_bot.ipynb
+Run the upload cell and select your PDF files (4–5 documents).
 
-### 3. Install dependencies
-```bash
-pip install langchain==0.0.350 langchain-community==0.0.1 openai==1.3.5 faiss-cpu pypdf tiktoken docx2txt
-```
+4. Run indexing pipeline
 
-### 4. Set your API key
-```python
-import os
-os.environ["OPENAI_API_KEY"] = "your-api-key-here"
-```
-Get your key from: https://platform.openai.com/api-keys
+Execute cells in order:
 
-### 5. Upload documents
-Run the upload cell — select your PDF files when prompted
+Load documents
+Split into chunks
+Generate embeddings
+Store in FAISS
 
-### 6. Index documents
-Run the ingestion cell — loads, chunks, embeds and saves to disk
+This step creates and saves the vector database.
 
-### 7. Ask questions
-Run the query cell — type any question and get answers with citations
+5. Run query system
 
-## Environment Variables
-This project uses HuggingFace open-source models which are completely free
-and require no API keys. No environment variables are needed to run this project.
-If we switch to OpenAI embeddings in future, we would need:
+Run the chatbot cell and start asking questions.
 
-| Variable | Description |
-|----------|-------------|
-| OPENAI_API_KEY | Your OpenAI key from platform.openai.com |
+Example Queries
+What is artificial intelligence?
+Explain climate change
+What are key features of the Indian economy?
+What is the impact of COVID-19?
+What are important space missions?
+Output
 
-## Example Queries
+For each query, the system provides:
 
-| Question | Expected Answer Theme |
-|----------|-----------------------|
-| What is artificial intelligence? | Definition, history, applications |
-| What causes climate change? | Greenhouse gases, human activity |
-| What are symptoms of COVID-19? | Fever, cough, breathing issues |
-| What is ISRO and its achievements? | Indian space agency, missions |
-| What are famous temples in India? | Architecture, location, significance |
+Generated answer
+Source information (file name and page number)
+Environment Variables
 
-## Known Limitations
-- Only answers from uploaded documents, not from internet
-- Colab session resets require re-running all cells
-- PDFs must be re-uploaded each Colab session
-- Works best with English language documents
-- Very short answers may be split across chunk boundaries
+This project uses open-source models and does not require any API keys.
+
+Known Limitations
+The language model used (GPT-2) is basic, so answers may be less detailed
+The system only answers from uploaded documents
+Accuracy depends on document quality
+Colab sessions reset, so files must be re-uploaded
+Final Note
+
+This project demonstrates a complete RAG pipeline including document ingestion, chunking, embedding, retrieval, and answer generation. The focus is on building a simple, understandable system that can be explained clearly and extended further.
+
