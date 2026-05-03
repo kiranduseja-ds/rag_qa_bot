@@ -1,6 +1,3 @@
-Got it — you want the **same README in original style**, with **vertical architecture diagram (clean + professional)** and aligned with your actual code (HuggingFace + FAISS, no OpenAI).
-
-Here is your **final corrected version** 
 
 ---
 
